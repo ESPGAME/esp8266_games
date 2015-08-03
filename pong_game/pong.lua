@@ -4,6 +4,8 @@ local PAD_W = 2
 local PAD_H = 20
 local ONE_SEC_US = 1000000
 
+local TEST_LOOPS = 200
+
 function init_i2c_display()
      -- SDA and SCL can be assigned freely to available GPIOs
      local sda = 5 -- GPIO14
@@ -26,7 +28,7 @@ function init_game()
     ball = obj.Ball(BALL_R)
     ball.x = width/2
     ball.y = height/2
-    ball.direction = {1, 1}
+    ball.direction = {1, 0}
     loopcnt = 0
     old = tmr.now()
     now = 0
@@ -43,16 +45,46 @@ function update_game()
         fps = 0 
     end
     loopcnt = loopcnt + 1
-    if loopcnt > 50 then
+    if loopcnt > TEST_LOOPS then
         tmr.stop(1)
     end
     ball.update(1)
-    if (ball.x >  width-ball.r*2 or ball.x - ball.r < 0) then
-        ball.direction[1] = - ball.direction[1]
-    elseif (ball.y >  height-ball.r*2 or ball.y - ball.r < 0) then
+    --if (ball.x >  width-ball.r*2 or ball.x - ball.r < 0) then
+    --    ball.direction[1] = - ball.direction[1]
+    --elseif (ball.y >  height-ball.r*2 or ball.y - ball.r < 0) then
+    if (ball.y >  height-ball.r*2 or ball.y - ball.r < 0) then
         ball.direction[2] = - ball.direction[2]
     end
     --print('update:', tmr.now()-now)
+    
+    local vx = ball.direction[1]*ball.speed
+    local vy = ball.direction[2]*ball.speed
+    if ball.direction[1] > 0  then
+        if second_player.x <= ball.x + ball.r*2 and
+           second_player.x > ball.x - vx + ball.r*2 then
+           local collision_diff = ball.x + ball.r*2 - second_player.x
+           local k = collision_diff/vx
+           local y = vx*k + (ball.y - vy)
+           if y >= second_player.y and 
+            y + ball.r*2 <= second_player.y + second_player.size[2] then
+              ball.x = second_player.x - ball.r*2
+              ball.y = math.floor(ball.y - vy + vy*k)
+              ball.direction[1] = - ball.direction[1]
+            end
+        end 
+    else
+        if first_player.x + first_player.size[1] >= ball.x then
+           local collision_diff = first_player.x + first_player.size[1] - ball.x
+           local k = collision_diff/-vx
+           local y = vx*k + (ball.y - vy)
+           if y >= first_player.y and  
+            y + ball.r*2 <= first_player.y + second_player.size[2] then
+              ball.x = first_player.x - first_player.size[1]
+              ball.y = math.floor(ball.y - vy + vy*k)
+              ball.direction[1] = - ball.direction[1]   
+            end
+        end
+    end    
 end
 
 function draw_game()

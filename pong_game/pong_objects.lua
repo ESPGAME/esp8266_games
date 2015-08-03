@@ -41,7 +41,6 @@ local function Ball(r)
     return self
 end
 
-M.Moveable = Moveable
 M.Paddle = Paddle
 M.Ball = Ball
 return M
