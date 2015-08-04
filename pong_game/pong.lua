@@ -1,9 +1,11 @@
 obj = require("pong_objects")
+gm = require("game_math")
+
 local BALL_R = 2
 local PAD_W = 2
 local PAD_H = 20
 local ONE_SEC_US = 1000000
-
+ 
 local FPS = 25
 local TICKS = 1000/FPS
 
@@ -21,17 +23,20 @@ end
 function init_game()
   height = disp:getHeight()
   width = disp:getWidth()
-  first_player = obj.Paddle(PAD_W, PAD_H)
-  first_player.x = 2
-  first_player.y = height/2 - first_player.size[2]/2
-  second_player = obj.Paddle(PAD_W, PAD_H)
-  second_player.x = width - 2 - 2
-  second_player.y = height/2 - second_player.size[2]/2
-
-  ball = obj.Ball(BALL_R)
-  ball.x = width/2
-  ball.y = height/2
-  ball.direction = {1, 0}
+  
+  local x = 2
+  local y = height/2 - PAD_H/2
+  first_player = obj.Paddle(x, y, PAD_W, PAD_H)
+  
+  x = width - 2 - 2
+  y = height/2 - PAD_H/2
+  second_player = obj.Paddle(x, y, PAD_W, PAD_H)
+  
+  x = width/2
+  y = height/2
+  ball = obj.Ball(x, y, BALL_R)
+  ball.direction = gm.Vector2D(1, 0)
+  
   loopcnt = 0
   old = tmr.now()
   now = 0
@@ -51,40 +56,37 @@ function update_game()
   if loopcnt > TEST_LOOPS then
     tmr.stop(1)
   end
-  ball.update(1)
-  --if (ball.x >  width-ball.r*2 or ball.x - ball.r < 0) then
-  --    ball.direction[1] = - ball.direction[1]
-  --elseif (ball.y >  height-ball.r*2 or ball.y - ball.r < 0) then
-  if (ball.y >  height-ball.r*2 or ball.y - ball.r < 0) then
-    ball.direction[2] = - ball.direction[2]
+  ball.update(dt/ONE_SEC_US)
+  if (ball.pos.y >  height-ball.r*2 or ball.pos.y - ball.r < 0) then
+    ball.direction.y = - ball.direction.y
   end
   --print('update:', tmr.now()-now)
     
-  local vx = ball.direction[1]*ball.speed
-  local vy = ball.direction[2]*ball.speed
-  if ball.direction[1] > 0  then
-    if second_player.x <= ball.x + ball.r*2 and
-      second_player.x > ball.x - vx + ball.r*2 then
-      local collision_diff = ball.x + ball.r*2 - second_player.x
-      local k = collision_diff/vx
-      local y = vx*k + (ball.y - vy)
-      if y >= second_player.y and 
-        y + ball.r*2 <= second_player.y + second_player.size[2] then
-        ball.x = second_player.x - ball.r*2
-        ball.y = math.floor(ball.y - vy + vy*k)
-        ball.direction[1] = - ball.direction[1]
+  local vb = ball.direction*ball.speed
+
+  if ball.direction.x > 0  then
+    if second_player.pos.x <= ball.pos.x + ball.r*2 and
+      second_player.pos.x > ball.pos.x - vb.x + ball.r*2 then
+      local collision_diff = ball.pos.x + ball.r*2 - second_player.pos.x
+      local k = collision_diff/vb.x
+      local y = vb.x*k + (ball.pos.y - vb.y)
+      if y >= second_player.pos.y and 
+        y + ball.r*2 <= second_player.pos.y + second_player.size.y then
+        ball.x = second_player.pos.x - ball.r*2
+        ball.y = math.floor(ball.pos.y - vb.y + vb.y*k)
+        ball.direction.x = - ball.direction.x
       end
     end 
   else
-    if first_player.x + first_player.size[1] >= ball.x then
-      local collision_diff = first_player.x + first_player.size[1] - ball.x
-      local k = collision_diff/-vx
-      local y = vx*k + (ball.y - vy)
-      if y >= first_player.y and  
-      y + ball.r*2 <= first_player.y + second_player.size[2] then
-        ball.x = first_player.x - first_player.size[1]
-        ball.y = math.floor(ball.y - vy + vy*k)
-        ball.direction[1] = - ball.direction[1]   
+    if first_player.pos.x + first_player.size.x >= ball.pos.x then
+      local collision_diff = first_player.pos.x + first_player.size.x - ball.pos.x
+      local k = collision_diff/-vb.x
+      local y = vb.x*k + (ball.pos.y - vb.y)
+      if y >= first_player.pos.y and  
+      y + ball.r*2 <= first_player.pos.y + second_player.size.y then
+        ball.pos.x = first_player.pos.x - first_player.size.x
+        ball.pos.y = math.floor(ball.pos.y - vb.y + vb.y*k)
+        ball.direction.x = - ball.direction.x  
       end
     end
   end    

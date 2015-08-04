@@ -2,12 +2,13 @@ local moduleName = ...
 local M = {}
 _G[moduleName] = M
 
-local function Moveable()
+gm = require("game_math")
+
+local function Moveable(x, y)
   local self = {
-    x = 0,
-    y = 0,
+    pos = gm.Vector2D(x, y),
     speed = 2,
-    direction = {0, 0}
+    direction = gm.Vector2D(0, 0)
   }
   function self.update()
   end
@@ -16,27 +17,26 @@ local function Moveable()
   return self
 end
 
-local function Paddle(w, h)
-  local self = Moveable()
-  self.size = {w, h}
+local function Paddle(x, y, w, h)
+  local self = Moveable(x, y)
+  self.size = gm.Vector2D(w, h)
   self.score = 0
 
   function self.draw()
-    disp:drawBox(self.x, self.y, self.size[1], self.size[2])
+    disp:drawBox(self.pos.x, self.pos.y, self.size.x, self.size.y)
   end
   
   return self
 end
 
-local function Ball(r)
-  local self = Moveable()
+local function Ball(x, y, r)
+  local self = Moveable(x, y, r)
   self.r = r
   function self.update(dt)
-    self.x = self.x + self.speed*self.direction[1]*dt
-    self.y = self.y + self.speed*self.direction[2]*dt
+    self.pos = self.pos + self.direction*self.speed*dt
   end
   function self.draw()
-    disp:drawDisc(self.x, self.y, self.r)
+    disp:drawDisc(math.floor(self.pos.x), math.floor(self.pos.y), self.r)
   end
   return self
 end
