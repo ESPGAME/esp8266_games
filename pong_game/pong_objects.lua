@@ -29,9 +29,10 @@ local function Paddle(x, y, w, h)
   return self
 end
 
-local function Ball(x, y, r)
-  local self = Moveable(x, y, r)
+local function Ball(x, y, d, r)
+  local self = Moveable(x, y)
   self.r = r
+  self.direction = gm.Vector2D(d[1], d[2])
   function self.update(dt)
     self.pos = self.pos + self.direction*self.speed*dt
   end

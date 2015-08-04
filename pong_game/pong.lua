@@ -1,5 +1,4 @@
 obj = require("pong_objects")
-gm = require("game_math")
 
 local BALL_R = 2
 local PAD_W = 2
@@ -23,7 +22,8 @@ end
 function init_game()
   height = disp:getHeight()
   width = disp:getWidth()
-  
+
+  local db = {1, 0}
   local x = 2
   local y = height/2 - PAD_H/2
   first_player = obj.Paddle(x, y, PAD_W, PAD_H)
@@ -34,8 +34,8 @@ function init_game()
   
   x = width/2
   y = height/2
-  ball = obj.Ball(x, y, BALL_R)
-  ball.direction = gm.Vector2D(1, 0)
+  ball = obj.Ball(x, y, db, BALL_R)
+  ball.speed = 4
   
   loopcnt = 0
   old = tmr.now()
@@ -54,13 +54,12 @@ function update_game()
   end
   loopcnt = loopcnt + 1
   if loopcnt > TEST_LOOPS then
-    tmr.stop(1)
+    pause_game()
   end
   ball.update(dt/ONE_SEC_US)
   if (ball.pos.y >  height-ball.r*2 or ball.pos.y - ball.r < 0) then
     ball.direction.y = - ball.direction.y
   end
-  --print('update:', tmr.now()-now)
     
   local vb = ball.direction*ball.speed
 
@@ -71,7 +70,7 @@ function update_game()
       local k = collision_diff/vb.x
       local y = vb.x*k + (ball.pos.y - vb.y)
       if y >= second_player.pos.y and 
-        y + ball.r*2 <= second_player.pos.y + second_player.size.y then
+       y + ball.r*2 <= second_player.pos.y + second_player.size.y then
         ball.x = second_player.pos.x - ball.r*2
         ball.y = math.floor(ball.pos.y - vb.y + vb.y*k)
         ball.direction.x = - ball.direction.x
@@ -81,15 +80,16 @@ function update_game()
     if first_player.pos.x + first_player.size.x >= ball.pos.x then
       local collision_diff = first_player.pos.x + first_player.size.x - ball.pos.x
       local k = collision_diff/-vb.x
-      local y = vb.x*k + (ball.pos.y - vb.y)
+      local y = vb.y*k + (ball.pos.y - vb.y)
       if y >= first_player.pos.y and  
-      y + ball.r*2 <= first_player.pos.y + second_player.size.y then
-        ball.pos.x = first_player.pos.x - first_player.size.x
+       y + ball.r*2 <= first_player.pos.y + second_player.size.y then
+        ball.pos.x = first_player.pos.x + first_player.size.x
         ball.pos.y = math.floor(ball.pos.y - vb.y + vb.y*k)
         ball.direction.x = - ball.direction.x  
       end
     end
-  end    
+  end   
+  --print('update:', tmr.now()-now) 
 end
 
 function draw_game()
@@ -108,6 +108,16 @@ function draw_game()
   for dot = 1, height, 16 do
     disp:drawLine(width/2, dot, width/2, dot+10);
   end
+end
+
+function start_game()
+  old = tmr.now()
+  tmr.start(1)
+  loopcnt = 0
+end
+
+function pause_game()
+  tmr.stop(1)
 end
 
 init_i2c_display()
