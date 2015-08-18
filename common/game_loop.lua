@@ -12,7 +12,6 @@ local function Game_Loop()
   local old_dt = 0
   local fps = 0
   local fps_count = 0
-  local d = 0
 
   function self.play()
     play = true
