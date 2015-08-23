@@ -1,14 +1,10 @@
-obj = require("pong_objects")
-
 local function Pong()
   local self = {
   }
+  local obj = require("pong_objects")
   local BALL_R = 2
   local PAD_W = 2
   local PAD_H = 20
-  local FPS = 25
-  local TICKS = 1000/FPS
-  local TEST_LOOPS = 50
 
   local height = disp:getHeight()
   local width = disp:getWidth()
@@ -25,25 +21,8 @@ local function Pong()
   y = height/2
   local ball = obj.Ball(x, y, db, BALL_R)
   ball.speed = 4
-  
-  local loopcnt = 0
-  local old = tmr.now()
-  local now = 0
-  local fps = 0
 
-  function self.update()
-    now = tmr.now()
-    local dt = now - old
-    --print(dt)
-    if dt >= ONE_SEC_US then
-      old = now
-      first_player.score = fps
-      fps = 0 
-    end
-    loopcnt = loopcnt + 1
-    if loopcnt > TEST_LOOPS then
-      pause_game()
-    end
+  function self.update(dt)
     ball.update(dt/ONE_SEC_US)
     if (ball.pos.y >  height-ball.r*2 or ball.pos.y - ball.r < 0) then
       ball.direction.y = - ball.direction.y
@@ -77,10 +56,9 @@ local function Pong()
         end
       end
     end   
-    --print('update:', tmr.now()-now) 
   end
 
-  function self.draw(dt)
+  function self.draw()
     first_player.draw()
     second_player.draw()
     -- ball
@@ -97,31 +75,7 @@ local function Pong()
       disp:drawLine(width/2, dot, width/2, dot+10);
     end
   end
-
-  function self.start_game()
-    old = tmr.now()
-    tmr.start(1)
-    loopcnt = 0
-  end
-
-  function self.pause_game()
-    tmr.stop(1)
-  end
+  return self
 end
 
-init_i2c_display()
-init_game()
-
-tmr.alarm(1, TICKS, 1, function() 
-  update_game()
-   
-  --local now_draw = tmr.now()
-  disp:firstPage()
-  repeat
-    draw_game()
-  until disp:nextPage() == false
-  --print("upd", tmr.now() - now_draw)
-   
-  tmr.wdclr()
-  fps = fps +1
-end )
+return Pong

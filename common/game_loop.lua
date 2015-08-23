@@ -1,4 +1,4 @@
-local function Game_Loop()
+local function Game_Loop(d)
   local self = {
   }
   local ONE_SEC_US = 1000000
@@ -12,6 +12,8 @@ local function Game_Loop()
   local old_dt = 0
   local fps = 0
   local fps_count = 0
+
+  local debug = d
 
   function self.play()
     play = true
@@ -27,7 +29,6 @@ local function Game_Loop()
 
   function self.load(game)
     self.game = require(game)
-    self.play()
   end
 
   function self.unload()
@@ -54,6 +55,9 @@ local function Game_Loop()
       disp:firstPage()
       repeat
         self.game.draw()
+        if debug then
+          disp:drawStr(disp:getWidth() - 10, disp:getHeight()/8, tostring(fps))
+        end
       until disp:nextPage() == false
       tmr.wdclr()
       fps = fps + 1

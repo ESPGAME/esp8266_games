@@ -8,10 +8,14 @@ range = srf05(trig, echo, function(l, d) print('range:'..l..', dt:'..d) lock = 0
 
 tmr.alarm(1, 2000, 1, function() 
   if lock == 0 then
-    range.getRange()
+    if pcall(range.getRange) then
+      print("getRange OK")
+    else
+      print("getRange err" )
+    end 
     lock = 1
     start = tmr.now()
   end
   if tmr.now() - start > 3000000 then lock = 0 end
   tmr.wdclr()
-end )
+end)
