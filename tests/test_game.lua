@@ -1,4 +1,7 @@
-game_loop = require(game_loop)
+print("--- Init game loop ---")
+print(node.heap())
+
+game_loop = require("game_loop")
 
 function init_i2c_display()
   local sda = 5 -- GPIO14
@@ -9,9 +12,6 @@ function init_i2c_display()
 end
 
 init_i2c_display()
-
-print("--- Init game loop ---")
-print(node.heap())
 
 game = game_loop()
 game.load('pong')
@@ -29,6 +29,8 @@ end
 
 game.pause()
 game.unload()
+game_loop = nil
+init_i2c_display = nil
 
 print("--- Stop game & unload ---")
 print(node.heap())

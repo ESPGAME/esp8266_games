@@ -23,7 +23,7 @@ local function Pong()
   ball.speed = 4
 
   function self.update(dt)
-    ball.update(dt/ONE_SEC_US)
+    ball.update(dt)
     if (ball.pos.y >  height-ball.r*2 or ball.pos.y - ball.r < 0) then
       ball.direction.y = - ball.direction.y
     end

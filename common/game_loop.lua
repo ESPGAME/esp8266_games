@@ -1,5 +1,6 @@
 local function Game_Loop(d)
   local self = {
+    game = nil
   }
   local ONE_SEC_US = 1000000
   local FPS = 25
@@ -28,7 +29,7 @@ local function Game_Loop(d)
   end
 
   function self.load(game)
-    self.game = require(game)
+    self.game = require(game)()
   end
 
   function self.unload()
@@ -37,7 +38,7 @@ local function Game_Loop(d)
   end
 
   function self.update()
-    if play then:
+    if play then
       now = tmr.now()
       dt = now - old_dt
       old_dt = now
@@ -46,12 +47,12 @@ local function Game_Loop(d)
         fps_count = fps
         fps = 0
       end
-      self.game.update(dt)
+      self.game.update(dt/ONE_SEC_US)
     end
   end
 
   function self.draw()
-    if play then:
+    if play then
       disp:firstPage()
       repeat
         self.game.draw()
