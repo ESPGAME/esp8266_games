@@ -1,6 +1,4 @@
-local moduleName = ...
 local M = {}
-_G[moduleName] = M
 
 gm = require("game_math")
 

@@ -29,10 +29,11 @@ local function Game_Loop(d)
   end
 
   function self.load(game)
-    self.game = require(game)()
+    self.game = dofile(game)()
   end
 
   function self.unload()
+    self.game.unload()
     self.game = nil
     self.pause()
   end
@@ -57,7 +58,7 @@ local function Game_Loop(d)
       repeat
         self.game.draw()
         if debug then
-          disp:drawStr(disp:getWidth() - 10, disp:getHeight()/8, tostring(fps))
+          disp:drawStr(disp:getWidth() - 10, disp:getHeight()/8, tostring(fps_count))
         end
       until disp:nextPage() == false
       tmr.wdclr()

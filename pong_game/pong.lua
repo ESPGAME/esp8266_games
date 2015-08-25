@@ -1,7 +1,7 @@
 local function Pong()
   local self = {
   }
-  local obj = require("pong_objects")
+  local obj = dofile("pong_objects.lua")
   local BALL_R = 2
   local PAD_W = 2
   local PAD_H = 20
@@ -74,6 +74,9 @@ local function Pong()
     for dot = 1, height, 16 do
       disp:drawLine(width/2, dot, width/2, dot+10);
     end
+  end
+  function self.unload()
+    obj = nil
   end
   return self
 end

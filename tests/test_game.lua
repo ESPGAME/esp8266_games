@@ -13,8 +13,8 @@ end
 
 init_i2c_display()
 
-game = game_loop()
-game.load('pong')
+game = game_loop(true)
+game.load('pong.lua')
 game.play()
 
 print("--- Start game ---")
@@ -22,15 +22,13 @@ print(node.heap())
 
 local loop = 0
 
-for loop = 1, 100, 1 do
+for loop = 1, 20, 1 do
   game.update()
   game.draw()
 end
 
 game.pause()
 game.unload()
-game_loop = nil
-init_i2c_display = nil
 
 print("--- Stop game & unload ---")
 print(node.heap())
