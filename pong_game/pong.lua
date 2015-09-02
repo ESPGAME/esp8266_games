@@ -22,6 +22,8 @@ local function Pong()
   local ball = obj.Ball(x, y, db, BALL_R)
   ball.speed = 4
 
+  disp:setFont(u8g.font_6x10)
+  
   function self.update(dt)
     ball.update(dt)
     if (ball.pos.y >  height-ball.r*2 or ball.pos.y - ball.r < 0) then
@@ -64,7 +66,6 @@ local function Pong()
     -- ball
     ball.draw()
     -- score
-    disp:setFont(u8g.font_6x10)
     disp:drawStr(width/2 - 10, height/8, tostring(first_player.score))
     disp:drawStr(width/2 + 10, height/8, tostring(second_player.score))
     -- frame

@@ -33,9 +33,10 @@ local function Game_Loop(d)
   end
 
   function self.unload()
-    self.game.unload()
+    if self.game.unload then self.game.unload() end
     self.game = nil
     self.pause()
+    collectgarbage("collect")
   end
 
   function self.update()
